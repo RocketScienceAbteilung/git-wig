@@ -69,15 +69,16 @@ class ParserThread(threading.Thread):
 
         lines = open(filename)
 
+        basename = os.path.splitext(os.path.basename(filename))[0]
         if filename.endswith(".gwd"):
-            return parse_drums(lines)
+            return parse_drums(lines, basename)
         if filename.endswith(".gwm"):
-            return parse_mels(lines)
+            return parse_mels(lines, basename)
         if filename.endswith(".gwp"):
-            return parse_poly(lines)
+            return parse_poly(lines, basename)
 
 
-def parse_mels(lines):
+def parse_mels(lines, name):
 
     # num_notes = len(lines)
 
@@ -105,7 +106,7 @@ def parse_mels(lines):
         vels.append(curr_vel)
 
     curr_dict = {
-        'name': 'someSynth',
+        'name': name,
         'type': tr_type,
         'channel': chan,
         'note': notes,
@@ -118,21 +119,22 @@ def parse_mels(lines):
     return pattern_list
 
 
-def parse_poly(lines):
+def parse_poly(lines, name):
 
     pattern_list = []
     tr_type = 'polyphon'
 
     chan = ''
 
+    k = 0
     for i in lines:
         ch_rgx = re.search('ch\:\s*(\d+)', i)
         if ch_rgx:
             chan = int(ch_rgx.group(1))
 
         m = re.search('([CDEFGAB])([b\#]?)-?(\d)\s((?:[\+\-][0-9]){1,})', i)
-
         if m:
+            k += 1
             root_note = iso.util.nametomidi(
                 str(m.group(1) + m.group(2) + m.group(3))
             ) + 12
@@ -149,13 +151,13 @@ def parse_poly(lines):
             notes = (i_mod_vals + root_note)
 
             curr_dict = {
-                'name': 'Poly',
+                'name': name + str(k),
                 'type': tr_type,
                 'channel': chan,
                 'note': notes.tolist(),
                 'amp': vels.tolist(),
-                'gate': 0.75,
-                'dur': 4
+                'gate': 0.9,
+                'dur': 8
             }
             pattern_list.append(curr_dict)
 
@@ -166,7 +168,7 @@ def parse_poly(lines):
     return pattern_list
 
 
-def parse_drums(lines):
+def parse_drums(lines, name):
 
     pattern_list = []
 

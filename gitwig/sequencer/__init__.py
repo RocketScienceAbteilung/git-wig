@@ -39,10 +39,12 @@ class SequencerThread(threading.Thread):
 
         if pattern['type'] in ["monophon", "polyphon"]:
             isobar_pattern['gate'] = pattern['gate']
+
         elif pattern['type'] is "drums":
             pass
 
         idx = self.clip_index(pattern['name'])
+        
         if idx > -1:
             print("Modifying", self.t.channels[idx].name)
             self.t.sched_mod(idx, isobar_pattern, quantize=16)
