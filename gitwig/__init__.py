@@ -38,6 +38,9 @@ class ui:
 def main(inargs=None):
     parser = argparse.ArgumentParser(description='git-wig sequencer')
     parser.add_argument('track_folder')
+    parser.add_argument('--noui', dest='noui', action='store_false')
+    parser.set_defaults(feature=True)
+
     args = parser.parse_args()
 
     class CheckForChangesEvent(FileSystemEventHandler):
@@ -67,44 +70,45 @@ def main(inargs=None):
     observer.schedule(event_handler, args.track_folder)
     observer.start()
 
-    f = ui()
+    if args.noui:
+        f = ui()
 
-    def render_tracks():
-        clips = sequencer.get_running_clips()
-        f.stdscr.clear()
-        f.stdscr.addstr(
-            0, 0,
-            "Track: %s (%d BPM)" % (song_name, bpm),
-            curses.color_pair(4)
-        )
-        for i, clip in enumerate(clips):
+        def render_tracks():
+            clips = sequencer.get_running_clips()
+            f.stdscr.clear()
             f.stdscr.addstr(
-                1, 1,
-                '#'.ljust(2) + 'clip'.ljust(10) + 'pattern'.ljust(64),
-                curses.color_pair(3)
+                0, 0,
+                "Track: %s (%d BPM)" % (song_name, bpm),
+                curses.color_pair(4)
             )
-            f.stdscr.addstr(i + 2, 1, clip[0])
-            f.stdscr.addstr(i + 2, 3, clip[1])
-            f.stdscr.addstr(i + 2, 13, clip[2], curses.color_pair(2))
-            f.stdscr.addstr(i + 2, 13 + clip[3], " ", curses.color_pair(1))
+            for i, clip in enumerate(clips):
+                f.stdscr.addstr(
+                    1, 1,
+                    '#'.ljust(2) + 'clip'.ljust(10) + 'pattern'.ljust(64),
+                    curses.color_pair(3)
+                )
+                f.stdscr.addstr(i + 2, 1, clip[0])
+                f.stdscr.addstr(i + 2, 3, clip[1])
+                f.stdscr.addstr(i + 2, 13, clip[2], curses.color_pair(2))
+                f.stdscr.addstr(i + 2, 13 + clip[3], " ", curses.color_pair(1))
 
-        f.stdscr.refresh()
+            f.stdscr.refresh()
+            scheduler.enter(0.05, 1, render_tracks, ())
+
+        scheduler = sched.scheduler(time.time, time.sleep)
         scheduler.enter(0.05, 1, render_tracks, ())
 
-    scheduler = sched.scheduler(time.time, time.sleep)
-    scheduler.enter(0.05, 1, render_tracks, ())
+        def signal_handler(signal, frame):
+            print('quitting git-wig')
+            f.quit_ui()
+            # stop all tracks
+            sequencer.stop_all()
+            # stop all threads
+            for t in threads:
+                t.quit = True
 
-    def signal_handler(signal, frame):
-        print('quitting git-wig')
-        f.quit_ui()
-        # stop all tracks
-        sequencer.stop_all()
-        # stop all threads
-        for t in threads:
-            t.quit = True
+            sys.exit(0)
 
-        sys.exit(0)
+        signal.signal(signal.SIGINT, signal_handler)
 
-    signal.signal(signal.SIGINT, signal_handler)
-
-    scheduler.run()
+        scheduler.run()
