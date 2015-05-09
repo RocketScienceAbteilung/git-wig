@@ -142,6 +142,9 @@ def parse_poly(lines, name):
         if ch_rgx:
             chan = int(ch_rgx.group(1))
 
+        if i[0] == "#":
+            continue
+
         m = re.search('([CDEFGAB])([b\#]?)-?(\d)\s((?:[\+\-][0-9a-fA-F/]){1,}):?((\d)\/?(\d)?)?', i)
 
         if m:
