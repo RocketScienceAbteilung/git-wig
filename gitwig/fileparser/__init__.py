@@ -175,9 +175,9 @@ def parse_drums(lines):
         if ch_rgx:
             chan = int(ch_rgx.group(1))
 
-        m = re.search('([.,\s]+)(.+):(\d{2}):?((\d)\/?(\d)?)?', i)
+        m = re.search('(#)?([.,\s]+)(.+):(\d{2}):?((\d)\/?(\d)?)?', i)
         if m:
-            content_line = m.group(1)
+            content_line = m.group(2)
             num_notes = len(content_line)
 
             # process content
@@ -193,7 +193,7 @@ def parse_drums(lines):
 
             forte_idcs = list(find_all(content_line, ParserThread.forte_char))
 
-            pattern_duration = m.group(4)
+            pattern_duration = m.group(5)
 
             if pattern_duration is None:
                 pattern_duration = 1
@@ -207,16 +207,24 @@ def parse_drums(lines):
                     )
                 )
 
+            mute = m.group(1)
+
             for i in piano_idcs:
-                notes[i] = m.group(3)
-                vels[i] = ParserThread.piano_vel
+                notes[i] = m.group(4)
+                if mute is not None:
+                    vels[i] = 0
+                else:
+                    vels[i] = ParserThread.piano_vel
 
             for i in forte_idcs:
-                notes[i] = m.group(3)
-                vels[i] = ParserThread.forte_vel
+                notes[i] = m.group(4)
+                if mute is not None:
+                    vels[i] = 0
+                else:
+                    vels[i] = ParserThread.forte_vel
 
             curr_dict = {
-                'name': m.group(2),
+                'name': m.group(3),
                 'type': tr_type,
                 'channel': chan,
                 'note': notes.tolist(),
