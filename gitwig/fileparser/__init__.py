@@ -126,7 +126,11 @@ def parse_poly(lines):
     chan = ''
 
     for i in lines:
-        m = re.search('([CDEFGAB])([b\#]?)(\d)\s((?:[\+\-][0-9]){1,})', i)
+        ch_rgx = re.search('ch\:\s*(\d+)', i)
+        if ch_rgx:
+            chan = int(ch_rgx.group(1))
+
+        m = re.search('([CDEFGAB])([b\#]?)-?(\d)\s((?:[\+\-][0-9]){1,})', i)
 
         if m:
             root_note = iso.util.nametomidi(
@@ -142,22 +146,22 @@ def parse_poly(lines):
             mod_vals = splitCount(note_mods, 2)
             i_mod_vals = np.array(map(int, mod_vals))
 
-            notes = i_mod_vals + root_note
+            notes = (i_mod_vals + root_note)
+
+            curr_dict = {
+                'name': 'Poly',
+                'type': tr_type,
+                'channel': chan,
+                'note': notes.tolist(),
+                'amp': vels.tolist(),
+                'gate': 0.75,
+                'dur': 4
+            }
+            pattern_list.append(curr_dict)
 
         else:
             root_note = 0
             curr_vel = 0
-
-    curr_dict = {
-        'name': 'someSynth',
-        'type': tr_type,
-        'channel': chan,
-        'note': notes,
-        'amp': vels,
-        'gate': 0.75,
-        'dur': 1
-    }
-    pattern_list.append(curr_dict)
 
     return pattern_list
 

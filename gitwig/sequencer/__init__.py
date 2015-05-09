@@ -37,7 +37,7 @@ class SequencerThread(threading.Thread):
         isobar_pattern['channel'] = pattern['channel'] - 1
         isobar_pattern['dur'] = pattern['dur']
 
-        if pattern['type'] is "monophon":
+        if pattern['type'] in ["monophon", "polyphon"]:
             isobar_pattern['gate'] = pattern['gate']
         elif pattern['type'] is "drums":
             pass
