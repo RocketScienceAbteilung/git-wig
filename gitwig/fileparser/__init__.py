@@ -7,6 +7,7 @@ import numpy as np
 import re
 import isobar as iso
 import argparse
+from itertools import izip
 
 
 class ParserThread(threading.Thread):
@@ -55,7 +56,7 @@ class ParserThread(threading.Thread):
         patterns = []
         for root, dirs, files in os.walk(foldername):
             for file in files:
-                if file.endswith(('.gwd', '.gwm')):
+                if file.endswith(('.gwd', '.gwm', '.gwp')):
                     parsed = self.parse_file(os.path.join(root, file))
                     if parsed is not None:
                         if isinstance(parsed, list):
@@ -72,6 +73,8 @@ class ParserThread(threading.Thread):
             return parse_drums(lines)
         if filename.endswith(".gwm"):
             return parse_mels(lines)
+        if filename.endswith(".gwp"):
+            return parse_poly(lines)
 
 
 def parse_mels(lines):
@@ -114,6 +117,50 @@ def parse_mels(lines):
 
     return pattern_list
 
+def parse_poly(lines):
+
+    pattern_list = []
+    tr_type = 'polyphon'
+
+    chan = ''
+
+
+    for i in lines:
+        m = re.search('([CDEFGAB])([b\#]?)(\d)\s((?:[\+\-][0-9]){1,})', i)
+
+        if m:
+            root_note = iso.util.nametomidi(
+                str(m.group(1) + m.group(2) + m.group(3))
+            ) + 12
+
+
+            note_mods = m.group(4)
+            num_notes = len(note_mods) / 2
+
+            notes = np.zeros((num_notes,), dtype=np.int)
+            vels = np.ones((num_notes,), dtype=np.int) * 127
+
+            mod_vals = splitCount(note_mods, 2)
+            i_mod_vals = np.array(map(int, mod_vals))
+
+            notes = i_mod_vals + root_note
+
+        else:
+            root_note = 0
+            curr_vel = 0
+
+    curr_dict = {
+        'name': 'someSynth',
+        'type': tr_type,
+        'channel': chan,
+        'note': notes,
+        'amp': vels,
+        'gate': 0.75,
+        'dur': 1
+    }
+    pattern_list.append(curr_dict)
+
+    return pattern_list
 
 def parse_drums(lines):
 
@@ -181,6 +228,8 @@ def parse_drums(lines):
 
     return pattern_list
 
+def splitCount(s, count):
+     return [''.join(x) for x in zip(*[list(s[z::count]) for z in range(count)])]
 
 def find_all(a_str, sub):
     start = 0
