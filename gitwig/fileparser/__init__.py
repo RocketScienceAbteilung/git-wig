@@ -142,10 +142,9 @@ def parse_poly(lines, name):
         if ch_rgx:
             chan = int(ch_rgx.group(1))
 
-        m = re.search('([CDEFGAB])([b\#]?)-?(\d)\s((?:[\+\-][0-9a-fA-F]){1,}):?((\d)\/?(\d)?)?', i)
+        m = re.search('([CDEFGAB])([b\#]?)-?(\d)\s((?:[\+\-][0-9a-fA-F/]){1,}):?((\d)\/?(\d)?)?', i)
 
         if m:
-
 
             k += 1
             root_note = iso.util.nametomidi(
@@ -156,11 +155,18 @@ def parse_poly(lines, name):
             num_notes = len(note_mods) / 2
 
             notes = np.zeros((num_notes,), dtype=np.int)
-            vels = np.ones((num_notes,), dtype=np.int) * 127
+
+            def parse_diffs(vals):
+                for x in vals:
+                    try:
+                        yield int(x, 16), 127
+                    except ValueError:
+                        yield 0, 0
 
             mod_vals = splitCount(note_mods, 2)
-            i_mod_vals = np.array([ int(x, 16) for x in mod_vals ])
-            
+            tmp = np.array(list(parse_diffs(mod_vals)))
+            vels = tmp[:, 1]
+            i_mod_vals = tmp[:, 0]
 
             pattern_duration = m.group(5)
 
