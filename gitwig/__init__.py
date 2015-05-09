@@ -84,19 +84,19 @@ def main(inargs=None):
             for i, clip in enumerate(clips):
                 f.stdscr.addstr(
                     1, 1,
-                    '#'.ljust(2) + 'clip'.ljust(10) + 'pattern'.ljust(64),
+                    '#'.ljust(3) + 'clip'.ljust(11) + 'pattern'.ljust(64),
                     curses.color_pair(3)
                 )
                 f.stdscr.addstr(i + 2, 1, clip[0])
-                f.stdscr.addstr(i + 2, 3, clip[1])
-                f.stdscr.addstr(i + 2, 13, clip[2], curses.color_pair(2))
-                f.stdscr.addstr(i + 2, 13 + clip[3], " ", curses.color_pair(1))
+                f.stdscr.addstr(i + 2, 4, clip[1])
+                f.stdscr.addstr(i + 2, 14, clip[2], curses.color_pair(2))
+                f.stdscr.addstr(i + 2, 14 + clip[3], " ", curses.color_pair(1))
 
             f.stdscr.refresh()
-            scheduler.enter(0.05, 1, render_tracks, ())
+            scheduler.enter(0.08, 1, render_tracks, ())
 
         scheduler = sched.scheduler(time.time, time.sleep)
-        scheduler.enter(0.05, 1, render_tracks, ())
+        scheduler.enter(0.08, 1, render_tracks, ())
 
         def signal_handler(signal, frame):
             print('quitting git-wig')
