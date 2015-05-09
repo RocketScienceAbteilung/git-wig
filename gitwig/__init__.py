@@ -55,8 +55,7 @@ def main(inargs=None):
     time.sleep(1)
 
     song_name, bpm = parser.parse_song(args.track_folder)
-
-    sequencer = SequencerThread(song_name, bpm)
+    sequencer = SequencerThread(song_name, bpm, device=None)
     pattern = parser.parse_folder(args.track_folder)
     sequencer.write(pattern)
     sequencer.start()

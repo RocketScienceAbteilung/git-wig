@@ -9,17 +9,18 @@ import numpy as np
 
 
 class SequencerThread(threading.Thread):
-    def __init__(self, name='mysong', bpm=132):
+    def __init__(self, name='mysong', bpm=132, device=None):
         threading.Thread.__init__(self)
         self.bpm = bpm
         self.quit = False
         self.name = name
+        output_device = iso.io.midi.MidiOut(device)
         self.t = iso.Timeline(
             bpm,
             ticks_per_beat=96,
             division=4,
             debug=False,
-            device=None
+            device=output_device
         )
 
     def write(self, pattern):
