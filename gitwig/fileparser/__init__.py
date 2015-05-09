@@ -117,13 +117,13 @@ def parse_mels(lines):
 
     return pattern_list
 
+
 def parse_poly(lines):
 
     pattern_list = []
     tr_type = 'polyphon'
 
     chan = ''
-
 
     for i in lines:
         m = re.search('([CDEFGAB])([b\#]?)(\d)\s((?:[\+\-][0-9]){1,})', i)
@@ -132,7 +132,6 @@ def parse_poly(lines):
             root_note = iso.util.nametomidi(
                 str(m.group(1) + m.group(2) + m.group(3))
             ) + 12
-
 
             note_mods = m.group(4)
             num_notes = len(note_mods) / 2
@@ -161,6 +160,7 @@ def parse_poly(lines):
     pattern_list.append(curr_dict)
 
     return pattern_list
+
 
 def parse_drums(lines):
 
@@ -236,8 +236,15 @@ def parse_drums(lines):
 
     return pattern_list
 
+
 def splitCount(s, count):
-     return [''.join(x) for x in zip(*[list(s[z::count]) for z in range(count)])]
+    return [
+        ''.join(x)
+        for x in zip(
+            *[list(s[z::count]) for z in range(count)]
+        )
+    ]
+
 
 def find_all(a_str, sub):
     start = 0
