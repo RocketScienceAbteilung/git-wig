@@ -18,6 +18,7 @@ class ui:
         curses.start_color()
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.noecho()
         curses.cbreak()
         curses.curs_set(0)
@@ -69,9 +70,15 @@ def main(inargs=None):
         clips = sequencer.get_running_clips()
         f.stdscr.clear()
         for i, clip in enumerate(clips):
-            f.stdscr.addstr(i, 1, clip[1])
-            f.stdscr.addstr(i, 11, clip[0], curses.color_pair(2))
-            f.stdscr.addstr(i, 11 + clip[2], " ", curses.color_pair(1))
+            f.stdscr.addstr(
+                0, 1,
+                '#'.ljust(2) + 'clip'.ljust(10) + 'pattern'.ljust(64),
+                curses.color_pair(3)
+            )
+            f.stdscr.addstr(i + 1, 1, clip[0])
+            f.stdscr.addstr(i + 1, 3, clip[1])
+            f.stdscr.addstr(i + 1, 13, clip[2], curses.color_pair(2))
+            f.stdscr.addstr(i + 1, 13 + clip[3], " ", curses.color_pair(1))
 
         f.stdscr.refresh()
         scheduler.enter(0.05, 1, render_tracks, ())

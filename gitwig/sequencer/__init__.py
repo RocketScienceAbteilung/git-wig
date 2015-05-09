@@ -34,7 +34,7 @@ class SequencerThread(threading.Thread):
 
         isobar_pattern['note'] = iso.PSeq(pattern['note'])
         isobar_pattern['amp'] = iso.PSeq(pattern['amp'])
-        isobar_pattern['channel'] = pattern['channel']
+        isobar_pattern['channel'] = pattern['channel'] - 1
         isobar_pattern['dur'] = pattern['dur']
 
         if pattern['type'] is "monophon":
@@ -73,8 +73,9 @@ class SequencerThread(threading.Thread):
                 map(str, (np.array(ch.events['amp'].list) > 0).astype(int))
             ).replace("0", " ").replace('1', '.')
             clips.append((
-                amps,
+                str(ch.events['channel'].constant + 1),
                 ch.name,
+                amps,
                 ch.events['note'].pos
             ))
 
