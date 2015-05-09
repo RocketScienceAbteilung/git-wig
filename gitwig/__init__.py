@@ -19,10 +19,12 @@ class ui:
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
         curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_RED)
         curses.noecho()
         curses.cbreak()
         curses.curs_set(0)
         self.stdscr.keypad(1)
+        (self.width, self.height) = self.stdscr.getmaxyx()
 
     def quit_ui(self):
         curses.nocbreak()
@@ -52,7 +54,9 @@ def main(inargs=None):
 
     time.sleep(1)
 
-    sequencer = SequencerThread()
+    song_name, bpm = parser.parse_song(args.track_folder)
+
+    sequencer = SequencerThread(song_name, bpm)
     pattern = parser.parse_folder(args.track_folder)
     sequencer.write(pattern)
     sequencer.start()
@@ -69,16 +73,21 @@ def main(inargs=None):
     def render_tracks():
         clips = sequencer.get_running_clips()
         f.stdscr.clear()
+        f.stdscr.addstr(
+            0, 0,
+            "Track: %s (%d BPM)" % (song_name, bpm),
+            curses.color_pair(4)
+        )
         for i, clip in enumerate(clips):
             f.stdscr.addstr(
-                0, 1,
+                1, 1,
                 '#'.ljust(2) + 'clip'.ljust(10) + 'pattern'.ljust(64),
                 curses.color_pair(3)
             )
-            f.stdscr.addstr(i + 1, 1, clip[0])
-            f.stdscr.addstr(i + 1, 3, clip[1])
-            f.stdscr.addstr(i + 1, 13, clip[2], curses.color_pair(2))
-            f.stdscr.addstr(i + 1, 13 + clip[3], " ", curses.color_pair(1))
+            f.stdscr.addstr(i + 2, 1, clip[0])
+            f.stdscr.addstr(i + 2, 3, clip[1])
+            f.stdscr.addstr(i + 2, 13, clip[2], curses.color_pair(2))
+            f.stdscr.addstr(i + 2, 13 + clip[3], " ", curses.color_pair(1))
 
         f.stdscr.refresh()
         scheduler.enter(0.05, 1, render_tracks, ())

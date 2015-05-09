@@ -9,10 +9,11 @@ import numpy as np
 
 
 class SequencerThread(threading.Thread):
-    def __init__(self, bpm=132):
+    def __init__(self, name='mysong', bpm=132):
         threading.Thread.__init__(self)
         self.bpm = bpm
         self.quit = False
+        self.name = name
         self.t = iso.Timeline(
             bpm,
             ticks_per_beat=96,
@@ -44,7 +45,7 @@ class SequencerThread(threading.Thread):
             pass
 
         idx = self.clip_index(pattern['name'])
-        
+
         if idx > -1:
             print("Modifying", self.t.channels[idx].name)
             self.t.sched_mod(idx, isobar_pattern, quantize=16)

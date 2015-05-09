@@ -7,6 +7,7 @@ import numpy as np
 import re
 import isobar as iso
 import argparse
+import yaml
 from itertools import izip
 
 
@@ -77,6 +78,15 @@ class ParserThread(threading.Thread):
         if filename.endswith(".gwp"):
             return parse_poly(lines, basename)
 
+    def parse_song(self, foldername):
+
+        for root, dirs, files in os.walk(foldername):
+            for file in files:
+                if file.endswith(".gws"):
+                    basename = os.path.splitext(os.path.basename(file))[0]
+                    stream = open(os.path.join(root, file), 'r')
+                    song = yaml.load(stream)
+                    return (song['Name'], int(song['bpm']))
 
 def parse_mels(lines, name):
 
