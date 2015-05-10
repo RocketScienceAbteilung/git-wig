@@ -1,7 +1,14 @@
-# gitwig
+# git-wig
 
-A Git based sequencer
+A Git enabled pattern sequencer. It allows to create music within the scope of your Dev environment. 
 
+## Features
+
+* plain text based pattern sequencer
+* supports drum, monophonic and polyphonic track formats
+* designed to be version controlled. 
+* [syntax highlighting package for atom](https://github.com/RocketScienceAbteilung/language-gwg)
+* console/curses session view
 
 ## Installation
 
