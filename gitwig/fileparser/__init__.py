@@ -8,7 +8,6 @@ import re
 import isobar as iso
 import argparse
 import yaml
-from itertools import izip
 
 
 class ParserThread(threading.Thread):
@@ -83,10 +82,10 @@ class ParserThread(threading.Thread):
         for root, dirs, files in os.walk(foldername):
             for file in files:
                 if file.endswith(".gws"):
-                    basename = os.path.splitext(os.path.basename(file))[0]
                     stream = open(os.path.join(root, file), 'r')
                     song = yaml.load(stream)
                     return (song['Name'], int(song['bpm']))
+
 
 def parse_mels(lines, name):
 
@@ -145,7 +144,10 @@ def parse_poly(lines, name):
         if i[0] == "#":
             continue
 
-        m = re.search('([CDEFGAB])([b\#]?)-?(\d)\s((?:[\+\-][0-9a-fA-F]|\s{2}){1,}):?((\d)\/?(\d)?)?', i)
+        m = re.search(
+            '([CDEFGAB])([b\#]?)-?(\d)\s((?:[\+\-][0-9a-fA-F]|\s{2}){1,}):?((\d)\/?(\d)?)?',
+            i
+        )
 
         if m:
 
@@ -157,7 +159,7 @@ def parse_poly(lines, name):
             note_mods = m.group(4)
             num_notes = len(note_mods) / 2
 
-            notes = np.zeros((num_notes,), dtype=np.int)
+            notes = np.zeros((int(num_notes),), dtype=np.int)
 
             def parse_diffs(vals):
                 for x in vals:
@@ -200,7 +202,6 @@ def parse_poly(lines, name):
 
         else:
             root_note = 0
-            curr_vel = 0
 
     return pattern_list
 
@@ -297,6 +298,7 @@ def find_all(a_str, sub):
             return
         yield start
         start += len(sub)  # use start += 1 to find overlapping matches
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
