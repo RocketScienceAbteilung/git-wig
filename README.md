@@ -1,6 +1,8 @@
 # git-wig
 
-A Git enabled pattern sequencer. It allows to create music within the scope of your Dev environment. 
+A Git enabled console pattern sequencer. It allows to create music within the scope of your Dev environment. 
+
+![gif](https://user-images.githubusercontent.com/72940/28498777-0454202e-6fa6-11e7-8a3c-9c85506013fa.gif)
 
 ## Features
 
