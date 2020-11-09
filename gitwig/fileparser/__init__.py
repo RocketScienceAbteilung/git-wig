@@ -48,7 +48,7 @@ class ParserThread(threading.Thread):
 
             # self.note_array = np.array(notes)
 
-            # print self.note_array
+            # print(self.note_array)
 
             time.sleep(1)
 
@@ -311,4 +311,4 @@ if __name__ == "__main__":
     p.start()
 
     pattern = p.parse_file(args.clip)
-    print pattern
+    print(pattern)
