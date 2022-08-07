@@ -32,7 +32,7 @@ class ui:
         curses.curs_set(1)
         curses.echo()
         curses.endwin()
-        print "Quit User Interface"
+        print("Quit User Interface")
 
 
 def main(inargs=None):

@@ -7,9 +7,9 @@ def print_ports(inargs=None):
         ("input", mido.get_input_names()),
         ("output", mido.get_output_names())
     ):
-        print "%s:" % typ[0]
+        print("%s:" % typ[0])
         for port in typ[1]:
-            print "  %s" % port
+            print("  %s" % port)
 
 
 def print_messages(inargs=None):
